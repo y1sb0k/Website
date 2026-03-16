@@ -4,15 +4,15 @@
 		<title>Pickle Rick Writeup - Callum Giblin</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<link rel="stylesheet" href="https://callumgibl.in/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="https://callumgibl.in/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
 
 		<div id="wrapper">
 
 				<header id="header" class="alt">
-						<a href="index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
+						<a href="https://callumgibl.in/index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
 						<nav>
 							<a href="#menu">Menu</a>
 						</nav>
@@ -20,16 +20,29 @@
 
 				<nav id="menu">
 						<ul class="links">
-							<li><a href="index.html">Home</a></li>
-							<li><a href="bio.html">About Me</a></li>
-							<li><a href="landing.html">Landing</a></li>
-							<li><a href="elements.html">Elements</a></li>
+							<li><a href="https://callumgibl.in/index.html">Home</a></li>
+							<li><a href="https://callumgibl.in/bio.html">About Me</a></li>
+							<li><a href="https://callumgibl.in/landing.html">Landing</a></li>
 						</ul>
 						<ul class="actions stacked">
 							<li><a href="#contact" class="button primary fit">Contact Me</a></li>
 						</ul>
 					</nav>
 
+					<!-- Banner -->
+			<section id="banner" class="major">
+				<div class="inner">
+					<header class="major">
+						<h1>Pickle Rick TryHackMe Room</h1>
+					</header>
+					<div class="content">
+						<p></p>
+						<ul class="actions">
+							<li><a href="tryhackme.html" class="button next scrolly">Back to TryHackMe Writeups</a></li>
+						</ul>
+					</div>
+				</div>
+			</section>
 				<section id="banner" class="style2">
 						<div class="inner">
 							<header class="major">
@@ -70,64 +83,39 @@
                                     <h2><ins>Flag One:</ins></h2>
                                     <p>Let's start with some initial enumeration. Using Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
                                     <pre><code>nmap -A -v 10.130.170.42</code></pre>
-                                    <p>Here the <code>-A</code> flag is an Aggressive Scan, which accumulates multiple nmap flags into one argument, namely; <code>-sV</code> (Services & Version Detection), <code>-o</code> (OS Detection), <code>-sC</code> (Default Script Scanning) and a traceroute function. I have also used the <code>-v</code> (Verbose) flag.</p>
                                     
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/nmap%20result.png?raw=true" alt="Screenshot of NMAP results" /></span>
 
-                                    <p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80.</p>
-                                    <p>Lets navigate to the website, and have a look around there, looking at our nmap results, this should be hosted on <code>http://10.130.170.42:80</code></p>
-                                    <p>Nice, it looks like we have a webpage here, initially looking around and attempting to interact with the webpage doesn’t provide any further details, nor does the content of the webpage.</p>
+                                    <p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80. Navigate to <code>http://10.130.170.42:80</code>.</p>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/website.png?raw=true" alt="Screenshot of webpage" /></span>
 
-                                    <p>However, lets take a look at the source code of the page.</p>
+                                    <p>Check the source code for hidden clues. Right there in the HTML source code, we have a Username commented out.</p>
+                                    
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/source%20code.png?raw=true" alt="Screenshot of source code" /></span>
 
-                                    <p>Right there in the HTML source code, we have a Username, commented out so it does not display on the webpage. Website developers often use this as a weak way to hide credentials for future reference.</p>
-                                    
                                     <p><strong>Username: R1ckRul3s</strong></p>
 
-                                    <p>The existence of a Username suggests that somewhere hosted on this server, there is a login page, to find it I am going to use the tool Gobuster. I am using the command:</p>
+                                    <p>Use Gobuster to search for hidden directories:</p>
                                     <pre><code>gobuster dir -u http://10.130.170.42/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt</code></pre>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/gobuster.png?raw=true" alt="Screenshot of Gobuster results" /></span>
 
-                                    <p>The output generated has given us 10 directories. We are interested in those with a status code 200:</p>
-                                    <ul>
-                                        <li><code>/index.html</code></li>
-                                        <li><code>/login.php</code></li>
-                                        <li><code>/robots.txt</code></li>
-                                    </ul>
-
-                                    <p>Checking <code>robots.txt</code>:</p>
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/robots.png?raw=true" alt="Screenshot of robots.txt" /></span>
-
-                                    <p>Interesting, no visible directories here, just the word “Wubbalubbadubdub”. Let's try that as a password on <code>/login.php</code>.</p>
+                                    <p>Checking <code>robots.txt</code> reveals "Wubbalubbadubdub". Testing this on the login page works!</p>
+                                    
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/login%20page.png?raw=true" alt="Screenshot of login page" /></span>
 
-                                    <p>Nice, it looks like we are in! The page displays a “Rick Portal”, with a command panel. <strong>Details for login:</strong></p>
-                                    <pre><code>Username: R1ckRul3s
-Password: Wubbalubbadubdub</code></pre>
-
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/denied.png?raw=true" alt="Screenshot of denied page" /></span>
-
-                                    <p>Let's take a look at the command panel and try <code>ls</code> to enumerate files.</p>
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/cmd%20panel.png?raw=true" alt="Screenshot of output of ls command" /></span>
-
-                                    <p>This shows a file named <code>Sup3rS3cretPickl3Ingred.txt</code>. <code>cat</code> is disabled, so we access it directly via the URL.</p>
+                                    <p>Inside the Command Panel, <code>ls</code> reveals <code>Sup3rS3cretPickl3Ingred.txt</code>. Since <code>cat</code> is blocked, we view it via URL.</p>
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag1.png?raw=true" alt="Screenshot of first flag" /></span>
                                     <p><strong>Flag 1: mr. meeseek hair</strong></p>
 
                                     <hr class="major" />
 
                                     <h2><ins>Flag Two:</ins></h2>
-                                    <p>Back in the Command Panel, by using <code>pwd</code>, I can see that we are in <code>/var/www/html</code>. I used <code>ls -la /home</code> to find users.</p>
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/users.png?raw=true" alt="Screenshot of users" /></span>
-                                    
-                                    <p>Checking <code>/home/rick</code>:</p>
+                                    <p>Find the second ingredient by checking <code>/home/rick</code> using <code>ls -la</code>.</p>
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/ricks%20files.png?raw=true" alt="Screenshot of ricks files" /></span>
 
-                                    <p>To read the file with a space in the name, I used a bash loop to escape the space:</p>
+                                    <p>To read the file with a space in the name:</p>
                                     <pre><code>while read line; do echo $line; done < /home/rick/second\ ingredients</code></pre>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag2.png?raw=true" alt="Screenshot of second flag" /></span>
@@ -136,11 +124,7 @@ Password: Wubbalubbadubdub</code></pre>
                                     <hr class="major" />
 
                                     <h2><ins>Flag Three:</ins></h2>
-                                    <p><em>Note: IP address changed to 10.130.158.202 during the session.</em></p>
-                                    <p>I checked the root directory using sudo: <code>sudo ls -la /root</code></p>
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/roots%20files.png?raw=true" alt="Screenshot of root directory" /></span>
-
-                                    <p>I copied the third flag to the web directory to view it:</p>
+                                    <p>Check the root directory using sudo: <code>sudo ls -la /root</code>. Copy the flag to the web directory to view it.</p>
                                     <pre><code>sudo cp /root/3rd.txt ./3rdFlag.txt</code></pre>
                                     
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png?raw=true" alt="Screenshot of third flag" /></span>
@@ -188,14 +172,7 @@ Password: Wubbalubbadubdub</code></pre>
 									<div class="contact-method">
 										<span class="icon solid alt fa-envelope"></span>
 										<h3>Email</h3>
-										<a href="#">c@llumgibl.in</a>
-									</div>
-								</section>
-								<section>
-									<div class="contact-method">
-										<span class="icon solid alt fa-home"></span>
-										<h3>Address</h3>
-										<span>Chester/Liverpool<br />United Kingdom</span>
+										<a href="mailto:c@llumgibl.in">c@llumgibl.in</a>
 									</div>
 								</section>
 							</section>
@@ -218,13 +195,13 @@ Password: Wubbalubbadubdub</code></pre>
 
 			</div>
 
-		<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+		<script src="https://callumgibl.in/assets/js/jquery.min.js"></script>
+			<script src="https://callumgibl.in/assets/js/jquery.scrolly.min.js"></script>
+			<script src="https://callumgibl.in/assets/js/jquery.scrollex.min.js"></script>
+			<script src="https://callumgibl.in/assets/js/browser.min.js"></script>
+			<script src="https://callumgibl.in/assets/js/breakpoints.min.js"></script>
+			<script src="https://callumgibl.in/assets/js/util.js"></script>
+			<script src="https://callumgibl.in/assets/js/main.js"></script>
 
 	</body>
 </html>
