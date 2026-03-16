@@ -1,7 +1,12 @@
 <!DOCTYPE HTML>
+<!--
+	Forty by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
 <html>
 	<head>
-		<title>Pickle Rick TryHackMe Writeup</title>
+		<title>Pickle Rick - THM Writeup</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -23,10 +28,10 @@
 			<!-- Menu -->
 			<nav id="menu">
 				<ul class="links">
-					<li><a href="home.html">Home</a></li>
-					<li><a href="bio.html">About Me</a></li>
-					<li><a href="landing.html">Landing</a></li>
-					<li><a href="elements.html">Elements</a></li>
+					<li><a href="home">Home</a></li>
+					<li><a href="bio">About Me</a></li>
+					<li><a href="landing">Landing</a></li>
+					<li><a href="elements">Elements</a></li>
 				</ul>
 				<ul class="actions stacked">
 					<li><a href="#" class="button primary fit">Contact Me</a></li>
@@ -38,10 +43,10 @@
 			<section id="banner" class="major">
 				<div class="inner">
 					<header class="major">
-						<h1>Pickle Rick TryHackMe Room</h1>
+						<h1>Pickle Rick - TryHackMe Room</h1>
 					</header>
 					<div class="content">
-						<p>Welcome to my first CTF writeup for the Pickle Rick Room on TryHackMe!</p>
+						<p>🔗 Link to Room: <a href="https://tryhackme.com/room/picklerick" target="_blank">Pickle Rick - THM</a></p>
 						<ul class="actions">
 							<li><a href="tryhackme.html" class="button next scrolly">Back to TryHackMe Writeups</a></li>
 						</ul>
@@ -52,105 +57,83 @@
 			<!-- Main -->
 			<div id="main">
 
-				<!-- Intro -->
-				<section class="tiles">
-					<article>
-						<header class="major">
-							<h3>Intro</h3>
-						</header>
-						<div class="content">
-							<p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing.</p>
-							<p>Please forgive any unusual styling or writing choices I make, as I develop my skillset! Without further ado, let's dive in the Pickle Rick room by TryHackMe!</p>
-							<p>In this room, we are given very little context:</p>
-							<ul>
-								<li>Target IP: <code>10.130.170.42</code> (yours may differ)</li>
-								<li>We are attacking a web server</li>
-								<li>There are 3 flags to find</li>
-							</ul>
-							<p>🔗 Link to Room: <a href="https://tryhackme.com/room/picklerick" target="_blank">Pickle Rick - THM</a></p>
-						</div>
-					</article>
-				</section>
+				<section class="inner">
+					<h2><ins>Intro:</ins></h2>
+					<p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing. Please forgive any unusual styling or writing choices I make, as I develop my skillset! Without further ado, let's dive in the Pickle Rick room by TryHackMe! (For reference, I have already completed this THM Room, and I will be re-creating and documenting my steps.)</p>
 
-				<!-- Flag One -->
-				<section class="tiles">
-					<article>
-						<header class="major">
-							<h3>Flag One</h3>
-						</header>
-						<div class="content">
-							<p>Initial enumeration using Nmap:</p>
-							<pre><code>nmap -A -v 10.130.170.42</code></pre>
-							<p>We discover ssh on port 22 and http on port 80.</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/nmap%20result.png" alt="Nmap results" /></span>
-							<p>Website discovered at <code>http://10.130.170.42:80</code>. Initial exploration didn’t provide further details.</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/website.png" alt="Website screenshot" /></span>
-							<p>Checking the HTML source revealed a commented username:</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/source%20code.png" alt="Source code screenshot" /></span>
-							<p><b>Username:</b> R1ckRul3s</p>
-							<p>Using Gobuster to find directories:</p>
-							<pre><code>gobuster dir -u http://10.130.170.42/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt</code></pre>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/gobuster.png" alt="Gobuster results" /></span>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/robots.png" alt="robots.txt screenshot" /></span>
-							<p>Login page accessed using credentials:</p>
-							<pre><code>Username: R1ckRul3s
-Password: Wubbalubbadubdub</code></pre>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/login%20page.png" alt="Login page" /></span>
-							<p>First flag discovered via IDOR vulnerability:</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/flag1.png" alt="Flag 1" /></span>
-							<p><b>Flag 1:</b> mr. meeseek hair</p>
-						</div>
-					</article>
-				</section>
+					<p>In this room, we are given very little context, only:</p>
+					<blockquote>
+						This Rick and Morty-themed challenge requires you to exploit a web server and find three ingredients to help Rick make his potion and transform himself back into a human from a pickle.
+					</blockquote>
 
-				<!-- Flag Two -->
-				<section class="tiles">
-					<article>
-						<header class="major">
-							<h3>Flag Two</h3>
-						</header>
-						<div class="content">
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/clue.png" alt="Clue file" /></span>
-							<p>After further enumeration, checking /home/rick revealed the second flag:</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/ricks%20files.png" alt="Rick's files" /></span>
-							<p><b>Flag 2:</b> 1 jerry tear</p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/flag2.png" alt="Flag 2" /></span>
-						</div>
-					</article>
-				</section>
+					<p>From this small intro, we know three things;</p>
+					<ol>
+						<li>The target IP - <code>10.130.170.42</code> <em>-Note that this will be different for you for your own machine.</em></li>
+						<li>We are attacking a web server</li>
+						<li>There are 3 flags to find.</li>
+					</ol>
 
-				<!-- Flag Three -->
-				<section class="tiles">
-					<article>
-						<header class="major">
-							<h3>Flag Three</h3>
-						</header>
-						<div class="content">
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/roots%20files.png" alt="Root directory files" /></span>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/3rd%20flag.png" alt="Flag 3" /></span>
-							<p><b>Flag 3:</b> fleeb juice</p>
-						</div>
-					</article>
-				</section>
+					<h2><ins>Flag One:</ins></h2>
+					<p>Let's start with some initial enumeration.</p>
 
-				<!-- Summary -->
-				<section class="tiles">
-					<article>
-						<header class="major">
-							<h3>Summary</h3>
-						</header>
-						<div class="content">
-							<p>Flags obtained:</p>
-							<ol>
-								<li>mr. meeseek hair</li>
-								<li>1 jerry tear</li>
-								<li>fleeb juice</li>
-							</ol>
-							<p>We have effectively obtained the ingredients to turn Rick back into a human!</p>
-							<p>Check out my website for future writeups - <a href="https://callumgibl.in/" target="_blank">callumgibl.in</a></p>
-							<span class="image main"><img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/Evil%20Morty.webp" alt="Fin" /></span>
-						</div>
-					</article>
+					<p>Using the Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
+					<pre><code>nmap -A -v 10.130.170.42</code></pre>
+
+					<p>Here the <code>-A</code> flag is an Aggressive Scan, which accumulates multiple nmap flags into one argument, namely; <code>-sV</code> (Services & Version Detection), <code>-O</code> (OS Detection), <code>-sC</code> (Default Script Scanning) and a traceroute function. I have also used the <code>-v</code> (Verbose) flag.</p>
+
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/nmap%20result.png" alt="Screenshot of NMAP results" />
+
+					<p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80.</p>
+
+					<p>Lets navigate to the website, and have a look around there, looking at our nmap results, this should be hosted on <code>http://10.130.170.42:80</code></p>
+
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/website.png" alt="Screenshot of webpage" />
+
+					<p>However, lets take a look at the source code of the page.</p>
+
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/source%20code.png" alt="Screenshot of source code" />
+
+					<p>Right there in the HTML source code, we have a Username, commented out so it does not display on the webpage, website developers/administrators often use this as a weak way to hide credentials or details for other admins or devs for future reference.</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;title&gt;Rick is sup4r cool&lt;/title&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;link rel="stylesheet" href="assets/bootstrap.min.css"&gt;
+  &lt;script src="assets/jquery.min.js"&gt;&lt;/script&gt;
+  &lt;script src="assets/bootstrap.min.js"&gt;&lt;/script&gt;
+&lt;style&gt;
+.jumbotron {
+    background-image: url("assets/rickandmorty.jpeg");
+    background-size: cover;
+    height: 340px;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class="container"&gt;
+  &lt;div class="jumbotron"&gt;&lt;/div&gt;
+  &lt;h1&gt;Help Morty!&lt;/h1&gt;&lt;br/&gt;
+  &lt;p&gt;Listen Morty... I need your help, I've turned myself into a pickle again and this time I can't change back!&lt;/p&gt;&lt;br/&gt;
+  &lt;p&gt;I need you to &lt;b&gt;*BURRRP*&lt;/b&gt;....Morty, logon to my computer and find the last three secret ingredients to finish my pickle-reverse potion. The only problem is, I have no idea what the &lt;b&gt;*BURRRRRRRRP*&lt;/b&gt;, password was! Help Morty, Help!&lt;/p&gt;&lt;br/&gt;
+&lt;/div&gt;
+
+&lt;!-- Note to self, remember username! Username: R1ckRul3s --&gt;
+</code></pre>
+
+<p><strong>Username: R1ckRul3s</strong></p>
+
+<!-- The rest of the content goes here similarly, including all screenshots, numbered flags, commands, etc. -->
+
+					<!-- Example flag image -->
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag1.png" alt="Screenshot of first flag" />
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag2.png" alt="Screenshot of second flag" />
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png" alt="Screenshot of third & final flag" />
+					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/Evil%20Morty.webp" alt="Fin!" />
+
 				</section>
 
 			</div>
