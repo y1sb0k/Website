@@ -29,27 +29,13 @@
 						</ul>
 					</nav>
 
-					<!-- Banner -->
-			<section id="banner" class="major">
-				<div class="inner">
-					<header class="major">
-						<h1>Pickle Rick TryHackMe Room</h1>
-					</header>
-					<div class="content">
-						<p></p>
-						<ul class="actions">
-							<li><a href="tryhackme.html" class="button next scrolly">Back to TryHackMe Writeups</a></li>
-						</ul>
-					</div>
-				</div>
-			</section>
 				<section id="banner" class="style2">
 						<div class="inner">
 							<header class="major">
 								<h1>Pickle Rick</h1>
 							</header>
 							<div class="content">
-								<p>TryHackMe Room Writeup: Web Application Penetration Testing</p>
+								<p>TryHackMe Room Writeup</p>
 							</div>
 						</div>
 					</section>
@@ -59,19 +45,22 @@
 						<section id="one">
 								<div class="inner">
 									<header class="major">
-										<h2>TryHackMe Room</h2>
+										<h2>Pickle Rick TryHackMe Room</h2>
 									</header>
 									<h3>🔗 Link to Room: <a href="https://tryhackme.com/room/picklerick" target="_blank">Pickle Rick - THM</a></h3>
 
                                     <hr class="major" />
 
                                     <h2><ins>Intro:</ins></h2>
-                                    <p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing. Please forgive any unusual styling or writing choices I make, as I develop my skillset! Without further ado, lets dive in the Pickle Rick room by TryHackMe! (For reference, I have already completed this THM Room, and I will be re-creating and documenting my steps.)</p>
+                                    <p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing.
+                                    Please forgive any unusual styling or writing choices I make, as I develop my skillset! 
+                                    Without further ado, lets dive in the Pickle Rick room by TryHackMe! 
+                                    (For reference, I have already completed this THM Room, and I will be re-creating and documenting my steps.)</p>
                                     
                                     <p>In this room, we are given very little context, only:</p>
                                     <blockquote>This Rick and Morty-themed challenge requires you to exploit a web server and find three ingredients to help Rick make his potion and transform himself back into a human from a pickle.</blockquote>
                                     
-                                    <p>From this small intro, we know three things:</p>
+                                    <p>From this small intro, we know three things;</p>
                                     <ol>
                                         <li>The target IP - <code>10.130.170.42</code> <em>-Note that this will be different for you for your own machine.</em></li>
                                         <li>We are attacking a web server</li>
@@ -81,63 +70,169 @@
                                     <hr class="major" />
 
                                     <h2><ins>Flag One:</ins></h2>
-                                    <p>Let's start with some initial enumeration. Using Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
+                                    <p>Let's start with some initial enumeration.</p>
+                                    <p>Using the Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
                                     <pre><code>nmap -A -v 10.130.170.42</code></pre>
+                                    <p>Here the <code>-A</code> flag is an Aggressive Scan, which accumulates multiple nmap flags into one argument, namely; <code>-sV</code> (Services & Version Detection), <code>-o</code> (OS Detection), <code>-sC</code> (Default Script Scanning) and a traceroute function. I have also used the <code>-v</code> (Verbose) flag.</p>
                                     
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/nmap%20result.png?raw=true" alt="Screenshot of NMAP results" /></span>
 
-                                    <p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80. Navigate to <code>http://10.130.170.42:80</code>.</p>
+                                    <p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80.</p>
+                                    <p>Lets navigate to the website, and have a look around there, looking at our nmap results, this should be hosted on <code>http://10.130.170.42:80</code></p>
+                                    <p>Nice, it looks like we have a webpage here, initially looking around and attempting to interact with the webpage doesn’t provide any further details, nor does the content of the webpage.</p>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/website.png?raw=true" alt="Screenshot of webpage" /></span>
 
-                                    <p>Check the source code for hidden clues. Right there in the HTML source code, we have a Username commented out.</p>
-                                    
+                                    <p>However, lets take a look at the source code of the page.</p>
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/source%20code.png?raw=true" alt="Screenshot of source code" /></span>
+
+                                    <p>Right there in the HTML source code, we have a Username, commented out so it does not display on the webpage, website developers/administrators often use this as a weak way to hide credentials or details for other admins or devs for future reference.</p>
+                                    
+                                    <p>Source Code:</p>
+                                    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;title&gt;Rick is sup4r cool&lt;/title&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;link rel="stylesheet" href="assets/bootstrap.min.css"&gt;
+  &lt;script src="assets/jquery.min.js"&gt;&lt;/script&gt;
+  &lt;script src="assets/bootstrap.min.js"&gt;&lt;/script&gt;
+  &lt;style&gt;
+  .jumbotron {
+    background-image: url("assets/rickandmorty.jpeg");
+    background-size: cover;
+    height: 340px;
+  }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class="container"&gt;
+    &lt;div class="jumbotron"&gt;&lt;/div&gt;
+    &lt;h1&gt;Help Morty!&lt;/h1&gt;&lt;/br&gt;
+    &lt;p&gt;Listen Morty... I need your help, I've turned myself into a pickle again and this time I can't change back!&lt;/p&gt;&lt;/br&gt;
+    &lt;p&gt;I need you to &lt;b&gt;*BURRRP*&lt;/b&gt;....Morty, logon to my computer and find the last three secret ingredients to finish my pickle-reverse potion. The only problem is,
+    I have no idea what the &lt;b&gt;*BURRRRRRRRP*&lt;/b&gt;, password was! Help Morty, Help!&lt;/p&gt;&lt;/br&gt;
+  &lt;/div&gt;
+
+  &lt;!--
+
+    Note to self, remember username!
+
+    Username: R1ckRul3s
+
+  --&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
                                     <p><strong>Username: R1ckRul3s</strong></p>
 
-                                    <p>Use Gobuster to search for hidden directories:</p>
+                                    <p>The existence of a Username suggests that somewhere hosted on this server, there is a login page, to find it I am going to use the tool Gobuster to search for hidden directories hosted on the server. I am using the command:</p>
                                     <pre><code>gobuster dir -u http://10.130.170.42/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt</code></pre>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/gobuster.png?raw=true" alt="Screenshot of Gobuster results" /></span>
 
-                                    <p>Checking <code>robots.txt</code> reveals "Wubbalubbadubdub". Testing this on the login page works!</p>
-                                    
+                                    <p>The output generated has given us 10 directories, we are only interested in the ones that returned with the HTTP status code of 200, as this indicates a successful connection. So we have:<br />
+                                    <code>/index.html</code><br />
+                                    <code>/login.php</code><br />
+                                    <code>/robots.txt</code></p>
+
+                                    <p>Since <code>robots.txt</code> files usually provide web crawlers and search engines about which pages and directories are permitted to be indexed, this is probably a good place to start, to see if there are any directories that Gobuster didn’t find due to our limited wordlist.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/robots.png?raw=true" alt="Screenshot of robots.txt" /></span>
+
+                                    <p>Interesting, no visible directories or pages here, just the word “Wubbalubbadubdub”, perhaps this is a clue, a password, or simply something to throw us off the scent.
+                                    Lets check out that /login.php website to see if we can use Wubbalubbadubdub as a password.</p>
+
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/login%20page.png?raw=true" alt="Screenshot of login page" /></span>
 
-                                    <p>Inside the Command Panel, <code>ls</code> reveals <code>Sup3rS3cretPickl3Ingred.txt</code>. Since <code>cat</code> is blocked, we view it via URL.</p>
+                                    <p>Nice, it looks like we are in! The page displays a “Rick Portal”, with a command panel, along with some other links along the top menu. Looking through these links, we are greeted by the /denied.php directory, and the message “Only the REAL rick can view this page..”, perhaps there is some privilege escalation required to an administrator account to view these pages.</p>
+                                    
+                                    <p><strong>Details for login:</strong></p>
+                                    <pre><code>Username: R1ckRul3s
+Password: Wubbalubbadubdub</code></pre>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/denied.png?raw=true" alt="Screenshot of denied page" /></span>
+
+                                    <p>Let's take a look at the command panel, perhaps we can attempt some command injection here. I am going to start with a simple <code>ls</code> command, to see if we can enumerate any files on the server.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/cmd%20panel.png?raw=true" alt="Screenshot of output of ls command" /></span>
+
+                                    <p>This shows a file named <code>Sup3rS3cretPickl3Ingred.txt</code>, this potentially contains a flag, lets have a look at it using <code>cat Sup3rS3cretPickl3Ingred.txt</code>.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/cat%20blocked.png?raw=true" alt="Screenshot of failed cat command" /></span>
+
+                                    <p>Hm it would seem that the use of cat is disabled here, trying other tools such as nano and vim also both show the same error. 
+                                    Perhaps something simpler would suffice, by putting the file name directly into the URL to see if there is an IDOR vulnerability here.</p>
+
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag1.png?raw=true" alt="Screenshot of first flag" /></span>
-                                    <p><strong>Flag 1: mr. meeseek hair</strong></p>
+
+                                    <p>Nice! We have the first flag!</p>
+                                    <p><strong>#Flag 1: mr. meeseek hair</strong></p>
 
                                     <hr class="major" />
 
                                     <h2><ins>Flag Two:</ins></h2>
-                                    <p>Find the second ingredient by checking <code>/home/rick</code> using <code>ls -la</code>.</p>
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/ricks%20files.png?raw=true" alt="Screenshot of ricks files" /></span>
+                                    <p>Going back to our Gobuster results, we have the file /clue.txt, let's check that out.</p>
 
-                                    <p>To read the file with a space in the name:</p>
-                                    <pre><code>while read line; do echo $line; done < /home/rick/second\ ingredients</code></pre>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/clue.png?raw=true" alt="Screenshot of clue file" /></span>
+
+                                    <p>Looks like we are going to need to do some more digging around the file directory to see what else we can find here.</p>
+                                    <p>Back in the Command Panel, by using <code>pwd</code>, I can see that we are in the <code>/var/www/html</code> directory, I want to see what users I can discover on the machine, by using <code>ls -la /home</code>, I should be able to print the home directory to see who is in there.
+                                    Note - using the flags <code>-la</code> allows us to add two flags to the <code>ls</code> command, <code>-l</code> for long format which shows us file permissions, owner, and group of the file owner, file size, and the “Last Modified” date.
+                                    This shows us there is a “rick” user and an “ubuntu” user.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/users.png?raw=true" alt="Screenshot of cmd panel showing users" /></span>
+
+                                    <p>Lets then check out what is in the /home/rick directory, to see if the second flag is in there using the command: <code>ls -la /home/rick</code></p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/ricks%20files.png?raw=true" alt="Screenshot of user rick's files" /></span>
+
+                                    <p>Okay, looks like we have the file for the second ingredient here, however, the same IDOR vulnerability used before won’t work again here without the file extension.</p>
+                                    <p>Since it would appear that most common ways to view this file are being blocked successfully, I am attempting to use inline bash commands, to read through the file and output the file contents, I did have to do some research externally for this, and consulted good old AI agents to ensure my thinking and coding was correct, however, the following command:</p>
+                                    <pre><code>while read line; do echo $line; done &lt; /home/rick/second ingredients</code></pre>
+                                    <p>This also did not provide an output, doing some further digging I discovered this is an issue caused by the space character, and the use of a backslash must be used to escape the space in the file name, so the command becomes:</p>
+                                    <pre><code>while read line; do echo $line; done &lt; /home/rick/second\ ingredients</code></pre>
+                                    <p>It worked! Tah-dah!! We finally have our second flag.</p>
 
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag2.png?raw=true" alt="Screenshot of second flag" /></span>
-                                    <p><strong>Flag 2: 1 jerry tear</strong></p>
+
+                                    <p><strong>#Flag 2: 1 jerry tear</strong></p>
 
                                     <hr class="major" />
 
                                     <h2><ins>Flag Three:</ins></h2>
-                                    <p>Check the root directory using sudo: <code>sudo ls -la /root</code>. Copy the flag to the web directory to view it.</p>
+                                    <p><em><strong>You may notice a change of IP address at this point to 10.130.158.202 - writing and hacking simultaneously is hard and slow work!</strong></em></p>
+                                    <p>After looking around in some additional source code of the webpage, and trying some further enumeration of the directories through Gobuster and Ffuf, it became apparent that nothing was else obvious was hidden around here, I decided to check in the root directory, to access this directory we must use the sudo command, so I used the command:</p>
+                                    <pre><code>sudo ls -la /root</code></pre>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/roots%20files.png?raw=true" alt="Screenshot of root directory" /></span>
+
+                                    <p>This shows us a file called <code>3rd.txt</code> - likely our third flag! I am going to attempt to make a copy of the file in our current directory, and recreate the IDOR vulnerability once this file is moved over, I copy the file to the current working directory using the command:</p>
                                     <pre><code>sudo cp /root/3rd.txt ./3rdFlag.txt</code></pre>
-                                    
-                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png?raw=true" alt="Screenshot of third flag" /></span>
-                                    <p><strong>Flag 3: fleeb juice</strong></p>
+                                    <p>Then by executing <code>ls</code> in the Command Panel, I can see that the file has been copied successfully over to our current working directory, similarly to before, I put this file name into the URL.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png?raw=true" alt="Screenshot of third & final flag" /></span>
+
+                                    <p>And there we have our third flag!</p>
+                                    <p><strong>#Flag 3: fleeb juice</strong></p>
 
                                     <hr class="major" />
 
                                     <h2><ins>Summary:</ins></h2>
+                                    <p>To summarise, our flags are:</p>
                                     <pre><code>1. mr. meeseek hair
 2. 1 jerry tear
 3. fleeb juice</code></pre>
 
-                                    <p>Happy Hacking! - Callum/y1sb0k</p>
+                                    <p>We have effectively obtained the ingredients list to turn Rick back into a human!</p>
+                                    <p>I hope you enjoyed my first ever writeup as much as I have enjoyed writing it!</p>
+                                    <p><em>Check out my website for future writeups - <a href="https://callumgibl.in/">https://callumgibl.in/</a></em></p>
+                                    <p>Happy Hacking!<br />
+                                    - Callum/y1sb0k</p>
+
                                     <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/Evil%20Morty.webp?raw=true" alt="Fin!" /></span>
 								</div>
 							</section>
