@@ -1,12 +1,7 @@
 <!DOCTYPE HTML>
-<!--
-	Forty by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 	<head>
-		<title>Pickle Rick - THM Writeup</title>
+		<title>Pickle Rick Writeup - Callum Giblin</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -14,155 +9,222 @@
 	</head>
 	<body class="is-preload">
 
-		<!-- Wrapper -->
 		<div id="wrapper">
 
-			<!-- Header -->
-			<header id="header" class="alt">
-				<a href="index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
-				<nav>
-					<a href="#menu">Menu</a>
-				</nav>
-			</header>
-
-			<!-- Menu -->
-			<nav id="menu">
-				<ul class="links">
-					<li><a href="home">Home</a></li>
-					<li><a href="bio">About Me</a></li>
-					<li><a href="landing">Landing</a></li>
-					<li><a href="elements">Elements</a></li>
-				</ul>
-				<ul class="actions stacked">
-					<li><a href="#" class="button primary fit">Contact Me</a></li>
-					<li><a href="#" class="button fit">Button</a></li>
-				</ul>
-			</nav>
-
-			<!-- Banner -->
-			<section id="banner" class="major">
-				<div class="inner">
-					<header class="major">
-						<h1>Pickle Rick - TryHackMe Room</h1>
+				<header id="header" class="alt">
+						<a href="index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
+						<nav>
+							<a href="#menu">Menu</a>
+						</nav>
 					</header>
-					<div class="content">
-						<p>🔗 Link to Room: <a href="https://tryhackme.com/room/picklerick" target="_blank">Pickle Rick - THM</a></p>
-						<ul class="actions">
-							<li><a href="tryhackme.html" class="button next scrolly">Back to TryHackMe Writeups</a></li>
+
+				<nav id="menu">
+						<ul class="links">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="bio.html">About Me</a></li>
+							<li><a href="landing.html">Landing</a></li>
+							<li><a href="elements.html">Elements</a></li>
 						</ul>
+						<ul class="actions stacked">
+							<li><a href="#contact" class="button primary fit">Contact Me</a></li>
+						</ul>
+					</nav>
+
+				<section id="banner" class="style2">
+						<div class="inner">
+							<header class="major">
+								<h1>Pickle Rick</h1>
+							</header>
+							<div class="content">
+								<p>TryHackMe Room Writeup: Web Application Penetration Testing</p>
+							</div>
+						</div>
+					</section>
+
+				<div id="main" class="alt">
+
+						<section id="one">
+								<div class="inner">
+									<header class="major">
+										<h2>TryHackMe Room</h2>
+									</header>
+									<h3>🔗 Link to Room: <a href="https://tryhackme.com/room/picklerick" target="_blank">Pickle Rick - THM</a></h3>
+
+                                    <hr class="major" />
+
+                                    <h2><ins>Intro:</ins></h2>
+                                    <p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing. Please forgive any unusual styling or writing choices I make, as I develop my skillset! Without further ado, lets dive in the Pickle Rick room by TryHackMe! (For reference, I have already completed this THM Room, and I will be re-creating and documenting my steps.)</p>
+                                    
+                                    <p>In this room, we are given very little context, only:</p>
+                                    <blockquote>This Rick and Morty-themed challenge requires you to exploit a web server and find three ingredients to help Rick make his potion and transform himself back into a human from a pickle.</blockquote>
+                                    
+                                    <p>From this small intro, we know three things:</p>
+                                    <ol>
+                                        <li>The target IP - <code>10.130.170.42</code> <em>-Note that this will be different for you for your own machine.</em></li>
+                                        <li>We are attacking a web server</li>
+                                        <li>There are 3 flags to find.</li>
+                                    </ol>
+
+                                    <hr class="major" />
+
+                                    <h2><ins>Flag One:</ins></h2>
+                                    <p>Let's start with some initial enumeration. Using Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
+                                    <pre><code>nmap -A -v 10.130.170.42</code></pre>
+                                    <p>Here the <code>-A</code> flag is an Aggressive Scan, which accumulates multiple nmap flags into one argument, namely; <code>-sV</code> (Services & Version Detection), <code>-o</code> (OS Detection), <code>-sC</code> (Default Script Scanning) and a traceroute function. I have also used the <code>-v</code> (Verbose) flag.</p>
+                                    
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/nmap%20result.png?raw=true" alt="Screenshot of NMAP results" /></span>
+
+                                    <p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80.</p>
+                                    <p>Lets navigate to the website, and have a look around there, looking at our nmap results, this should be hosted on <code>http://10.130.170.42:80</code></p>
+                                    <p>Nice, it looks like we have a webpage here, initially looking around and attempting to interact with the webpage doesn’t provide any further details, nor does the content of the webpage.</p>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/website.png?raw=true" alt="Screenshot of webpage" /></span>
+
+                                    <p>However, lets take a look at the source code of the page.</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/source%20code.png?raw=true" alt="Screenshot of source code" /></span>
+
+                                    <p>Right there in the HTML source code, we have a Username, commented out so it does not display on the webpage. Website developers often use this as a weak way to hide credentials for future reference.</p>
+                                    
+                                    <p><strong>Username: R1ckRul3s</strong></p>
+
+                                    <p>The existence of a Username suggests that somewhere hosted on this server, there is a login page, to find it I am going to use the tool Gobuster. I am using the command:</p>
+                                    <pre><code>gobuster dir -u http://10.130.170.42/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt</code></pre>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/gobuster.png?raw=true" alt="Screenshot of Gobuster results" /></span>
+
+                                    <p>The output generated has given us 10 directories. We are interested in those with a status code 200:</p>
+                                    <ul>
+                                        <li><code>/index.html</code></li>
+                                        <li><code>/login.php</code></li>
+                                        <li><code>/robots.txt</code></li>
+                                    </ul>
+
+                                    <p>Checking <code>robots.txt</code>:</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/robots.png?raw=true" alt="Screenshot of robots.txt" /></span>
+
+                                    <p>Interesting, no visible directories here, just the word “Wubbalubbadubdub”. Let's try that as a password on <code>/login.php</code>.</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/login%20page.png?raw=true" alt="Screenshot of login page" /></span>
+
+                                    <p>Nice, it looks like we are in! The page displays a “Rick Portal”, with a command panel. <strong>Details for login:</strong></p>
+                                    <pre><code>Username: R1ckRul3s
+Password: Wubbalubbadubdub</code></pre>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/denied.png?raw=true" alt="Screenshot of denied page" /></span>
+
+                                    <p>Let's take a look at the command panel and try <code>ls</code> to enumerate files.</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/cmd%20panel.png?raw=true" alt="Screenshot of output of ls command" /></span>
+
+                                    <p>This shows a file named <code>Sup3rS3cretPickl3Ingred.txt</code>. <code>cat</code> is disabled, so we access it directly via the URL.</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag1.png?raw=true" alt="Screenshot of first flag" /></span>
+                                    <p><strong>Flag 1: mr. meeseek hair</strong></p>
+
+                                    <hr class="major" />
+
+                                    <h2><ins>Flag Two:</ins></h2>
+                                    <p>Back in the Command Panel, by using <code>pwd</code>, I can see that we are in <code>/var/www/html</code>. I used <code>ls -la /home</code> to find users.</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/users.png?raw=true" alt="Screenshot of users" /></span>
+                                    
+                                    <p>Checking <code>/home/rick</code>:</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/ricks%20files.png?raw=true" alt="Screenshot of ricks files" /></span>
+
+                                    <p>To read the file with a space in the name, I used a bash loop to escape the space:</p>
+                                    <pre><code>while read line; do echo $line; done < /home/rick/second\ ingredients</code></pre>
+
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag2.png?raw=true" alt="Screenshot of second flag" /></span>
+                                    <p><strong>Flag 2: 1 jerry tear</strong></p>
+
+                                    <hr class="major" />
+
+                                    <h2><ins>Flag Three:</ins></h2>
+                                    <p><em>Note: IP address changed to 10.130.158.202 during the session.</em></p>
+                                    <p>I checked the root directory using sudo: <code>sudo ls -la /root</code></p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/roots%20files.png?raw=true" alt="Screenshot of root directory" /></span>
+
+                                    <p>I copied the third flag to the web directory to view it:</p>
+                                    <pre><code>sudo cp /root/3rd.txt ./3rdFlag.txt</code></pre>
+                                    
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png?raw=true" alt="Screenshot of third flag" /></span>
+                                    <p><strong>Flag 3: fleeb juice</strong></p>
+
+                                    <hr class="major" />
+
+                                    <h2><ins>Summary:</ins></h2>
+                                    <pre><code>1. mr. meeseek hair
+2. 1 jerry tear
+3. fleeb juice</code></pre>
+
+                                    <p>Happy Hacking! - Callum/y1sb0k</p>
+                                    <span class="image main"><img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/Evil%20Morty.webp?raw=true" alt="Fin!" /></span>
+								</div>
+							</section>
+
 					</div>
-				</div>
-			</section>
 
-			<!-- Main -->
-			<div id="main">
+				<section id="contact">
+						<div class="inner">
+							<section>
+								<form method="post" action="#">
+									<div class="fields">
+										<div class="field half">
+											<label for="name">Name</label>
+											<input type="text" name="name" id="name" />
+										</div>
+										<div class="field half">
+											<label for="email">Email</label>
+											<input type="text" name="email" id="email" />
+										</div>
+										<div class="field">
+											<label for="message">Message</label>
+											<textarea name="message" id="message" rows="6"></textarea>
+										</div>
+									</div>
+									<ul class="actions">
+										<li><input type="submit" value="Send Message" class="primary" /></li>
+									</ul>
+								</form>
+							</section>
+							<section class="split">
+								<section>
+									<div class="contact-method">
+										<span class="icon solid alt fa-envelope"></span>
+										<h3>Email</h3>
+										<a href="#">c@llumgibl.in</a>
+									</div>
+								</section>
+								<section>
+									<div class="contact-method">
+										<span class="icon solid alt fa-home"></span>
+										<h3>Address</h3>
+										<span>Chester/Liverpool<br />United Kingdom</span>
+									</div>
+								</section>
+							</section>
+						</div>
+					</section>
 
-				<section class="inner">
-					<h2><ins>Intro:</ins></h2>
-					<p>Welcome to my first ever CTF Writeup! I am writing this writeup to both help develop myself and my skills, whilst hopefully guiding others who are new to the field of Web Application Penetration Testing. Please forgive any unusual styling or writing choices I make, as I develop my skillset! Without further ado, let's dive in the Pickle Rick room by TryHackMe! (For reference, I have already completed this THM Room, and I will be re-creating and documenting my steps.)</p>
-
-					<p>In this room, we are given very little context, only:</p>
-					<blockquote>
-						This Rick and Morty-themed challenge requires you to exploit a web server and find three ingredients to help Rick make his potion and transform himself back into a human from a pickle.
-					</blockquote>
-
-					<p>From this small intro, we know three things;</p>
-					<ol>
-						<li>The target IP - <code>10.130.170.42</code> <em>-Note that this will be different for you for your own machine.</em></li>
-						<li>We are attacking a web server</li>
-						<li>There are 3 flags to find.</li>
-					</ol>
-
-					<h2><ins>Flag One:</ins></h2>
-					<p>Let's start with some initial enumeration.</p>
-
-					<p>Using the Nmap will allow us to take a look at the server, specifically identifying ports and services it may be running that may reveal potential vulnerabilities. I have used the command:</p>
-					<pre><code>nmap -A -v 10.130.170.42</code></pre>
-
-					<p>Here the <code>-A</code> flag is an Aggressive Scan, which accumulates multiple nmap flags into one argument, namely; <code>-sV</code> (Services & Version Detection), <code>-O</code> (OS Detection), <code>-sC</code> (Default Script Scanning) and a traceroute function. I have also used the <code>-v</code> (Verbose) flag.</p>
-
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/nmap%20result.png" alt="Screenshot of NMAP results" />
-
-					<p>As shown in the output, we have two open ports, ssh running on port 22, and http running on port 80.</p>
-
-					<p>Lets navigate to the website, and have a look around there, looking at our nmap results, this should be hosted on <code>http://10.130.170.42:80</code></p>
-
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/website.png" alt="Screenshot of webpage" />
-
-					<p>However, lets take a look at the source code of the page.</p>
-
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/source%20code.png" alt="Screenshot of source code" />
-
-					<p>Right there in the HTML source code, we have a Username, commented out so it does not display on the webpage, website developers/administrators often use this as a weak way to hide credentials or details for other admins or devs for future reference.</p>
-
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-  &lt;title&gt;Rick is sup4r cool&lt;/title&gt;
-  &lt;meta charset="utf-8"&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-  &lt;link rel="stylesheet" href="assets/bootstrap.min.css"&gt;
-  &lt;script src="assets/jquery.min.js"&gt;&lt;/script&gt;
-  &lt;script src="assets/bootstrap.min.js"&gt;&lt;/script&gt;
-&lt;style&gt;
-.jumbotron {
-    background-image: url("assets/rickandmorty.jpeg");
-    background-size: cover;
-    height: 340px;
-}
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-
-&lt;div class="container"&gt;
-  &lt;div class="jumbotron"&gt;&lt;/div&gt;
-  &lt;h1&gt;Help Morty!&lt;/h1&gt;&lt;br/&gt;
-  &lt;p&gt;Listen Morty... I need your help, I've turned myself into a pickle again and this time I can't change back!&lt;/p&gt;&lt;br/&gt;
-  &lt;p&gt;I need you to &lt;b&gt;*BURRRP*&lt;/b&gt;....Morty, logon to my computer and find the last three secret ingredients to finish my pickle-reverse potion. The only problem is, I have no idea what the &lt;b&gt;*BURRRRRRRRP*&lt;/b&gt;, password was! Help Morty, Help!&lt;/p&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-&lt;!-- Note to self, remember username! Username: R1ckRul3s --&gt;
-</code></pre>
-
-<p><strong>Username: R1ckRul3s</strong></p>
-
-<!-- The rest of the content goes here similarly, including all screenshots, numbered flags, commands, etc. -->
-
-					<!-- Example flag image -->
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag1.png" alt="Screenshot of first flag" />
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/flag2.png" alt="Screenshot of second flag" />
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/3rd%20flag.png" alt="Screenshot of third & final flag" />
-					<img src="https://github.com/y1sb0k/THM-Writeups/blob/main/Pickle%20Rick/assets/Evil%20Morty.webp" alt="Fin!" />
-
-				</section>
+				<footer id="footer">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://x.com/y1sb0k" class="icon brands alt fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+								<li><a href="https://tryhackme.com/p/y1sb0k" class="icon solid alt fa-terminal" target="_blank"><span class="label">TryHackMe</span></a></li>
+								<li><a href="https://github.com/y1sb0k" class="icon brands alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+								<li><a href="https://www.linkedin.com/in/callumgiblin/" class="icon brands alt fa-linkedin-in" target="_blank"><span class="label">LinkedIn</span></a></li>
+							</ul>
+							<ul class="copyright">
+								<li>&copy; Callum Giblin 2026</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</footer>
 
 			</div>
 
-			<!-- Footer -->
-			<footer id="footer">
-				<div class="inner">
-					<ul class="icons">
-						<li><a href="https://x.com/y1sb0k" class="icon brands alt fa-twitter" target="_blank" rel="noopener noreferrer"><span class="label">Twitter</span></a></li>
-						<li><a href="https://tryhackme.com/p/y1sb0k" class="icon solid alt fa-terminal" target="_blank" rel="noopener noreferrer"><span class="label">TryHackMe</span></a></li>
-						<li><a href="https://github.com/y1sb0k" class="icon brands alt fa-github" target="_blank" rel="noopener noreferrer"><span class="label">GitHub</span></a></li>
-						<li><a href="https://www.linkedin.com/in/callumgiblin/" class="icon brands alt fa-linkedin-in" target="_blank" rel="noopener noreferrer"><span class="label">LinkedIn</span></a></li>
-					</ul>
-					<ul class="copyright">
-						<li>&copy; Callum Giblin 2026</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
-					</ul>
-				</div>
-			</footer>
-
-		</div>
-
-		<!-- Scripts -->
 		<script src="assets/js/jquery.min.js"></script>
-		<script src="assets/js/jquery.scrolly.min.js"></script>
-		<script src="assets/js/jquery.scrollex.min.js"></script>
-		<script src="assets/js/browser.min.js"></script>
-		<script src="assets/js/breakpoints.min.js"></script>
-		<script src="assets/js/util.js"></script>
-		<script src="assets/js/main.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
 
 	</body>
 </html>
