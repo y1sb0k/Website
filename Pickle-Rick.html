@@ -1,19 +1,20 @@
 <html>
 	<head>
-		<title>Callum Giblin</title>
+		<title>Pickle Rick TryHackMe Writeup - Callum Giblin</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
 	</head>
+
 	<body class="is-preload">
 
 		<!-- Wrapper -->
 			<div id="wrapper">
 
 				<!-- Header -->
-					<header id="header" class="alt">
-						<a href="index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Callum Giblin</strong> <span>Cyber Security</span></a>
 						<nav>
 							<a href="#menu">Menu</a>
 						</nav>
@@ -22,10 +23,10 @@
 				<!-- Menu -->
 					<nav id="menu">
 						<ul class="links">
-							<li><a href="home">Home</a></li>
-							<li><a href="bio">About Me</a></li>
-							<li><a href="landing">Landing</a></li>
-							<li><a href="elements">Elements</a></li>
+							<li><a href="../home">Home</a></li>
+							<li><a href="../bio">About Me</a></li>
+							<li><a href="../landing">Landing</a></li>
+							<li><a href="../elements">Elements</a></li>
 						</ul>
 						<ul class="actions stacked">
 							<li><a href="#" class="button primary fit">Contact Me</a></li>
@@ -33,270 +34,227 @@
 						</ul>
 					</nav>
 
-				<!-- Banner -->
-					<section id="banner" class="major">
-						<div class="inner">
-							<header class="major">
-								<h1>Hi, my name is Callum</h1>
-							</header>
-							<div class="content">
-								<p>A Cyber Security Analyst, with interests in Web-Application<br />
-								 Hacking, IoT Hacking, Automation and AI</p>
-								<ul class="actions">
-									<li><a href="#one" class="button next scrolly">Projects</a></li>
-								</ul>
-							</div>
-						</div>
-					</section>
-				
 				<!-- Main -->
+					<div id="main">
 
-<div id="main" class="alt">
+						<!-- Writeup -->
+							<section id="one">
+								<div class="inner">
 
-<section id="one">
-<div class="inner">
+									<header class="major">
+										<h1>Pickle Rick – TryHackMe Writeup</h1>
+									</header>
 
-<header class="major">
-<h1>Pickle Rick – TryHackMe Writeup</h1>
-</header>
+									<p>
+									This is my first CTF writeup. In this Rick and Morty themed challenge
+									we exploit a vulnerable web server to retrieve three ingredients
+									needed to turn Rick back into a human.
+									</p>
 
-<h3>🔗 Link to Room</h3>
-<p>
-<a href="https://tryhackme.com/room/picklerick" target="_blank">
-Pickle Rick - TryHackMe
-</a>
-</p>
+									<hr class="major" />
 
-<h2>Intro</h2>
+									<h2>Enumeration</h2>
 
-<p>
-Welcome to my first ever CTF writeup. I created this both to develop my skills
-and to help beginners learning Web Application Penetration Testing.
-</p>
-
-<p>
-This Rick and Morty themed challenge requires us to exploit a web server
-and locate three ingredients to turn Rick back into a human.
-</p>
-
-<p>From the introduction we know:</p>
-
-<ul>
-<li>We have a target machine IP</li>
-<li>We are attacking a web server</li>
-<li>Three flags must be found</li>
-</ul>
-
-<hr class="major"/>
-
-<h2>Flag One</h2>
-
-<p>First we perform enumeration using Nmap:</p>
+									<p>We start with an Nmap scan:</p>
 
 <pre><code>nmap -A -v 10.130.170.42</code></pre>
 
-<p>
-The <b>-A</b> flag performs aggressive scanning including service and OS detection.
-</p>
+									<span class="image fit">
+										<img src="../images/pickle-rick/nmap.png" alt="Nmap Results" />
+									</span>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/nmap%20result.png" alt="Nmap results">
-</span>
+									<p>The scan reveals two open ports:</p>
 
-<p>The scan reveals two open ports:</p>
+									<ul>
+										<li>22 - SSH</li>
+										<li>80 - HTTP</li>
+									</ul>
 
-<ul>
-<li>22 - SSH</li>
-<li>80 - HTTP</li>
-</ul>
+									<hr class="major" />
 
-<p>Opening the webpage:</p>
+									<h2>Web Enumeration</h2>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/website.png" alt="Website">
-</span>
+									<p>Opening the web server:</p>
 
-<p>Inspecting the source code reveals a hidden username:</p>
+									<span class="image fit">
+										<img src="../images/pickle-rick/website.png" alt="Website" />
+									</span>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/source%20code.png" alt="Source code">
-</span>
+									<p>Inspecting the page source reveals a hidden username:</p>
+
+									<span class="image fit">
+										<img src="../images/pickle-rick/source.png" alt="Source Code" />
+									</span>
 
 <pre><code>Username: R1ckRul3s</code></pre>
 
-<p>We search for hidden directories using Gobuster:</p>
+									<p>Next we perform directory brute forcing using Gobuster:</p>
 
-<pre><code>
-gobuster dir -u http://10.130.170.42 \
--w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
--x php,html,txt
-</code></pre>
+<pre><code>gobuster dir -u http://10.130.170.42 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt</code></pre>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/gobuster.png" alt="Gobuster results">
-</span>
+									<span class="image fit">
+										<img src="../images/pickle-rick/gobuster.png" alt="Gobuster Results" />
+									</span>
 
-<p>Important directories discovered:</p>
+									<p>We discover several useful endpoints:</p>
 
-<pre><code>
-/index.html
-/login.php
-/robots.txt
-</code></pre>
+									<ul>
+										<li>/login.php</li>
+										<li>/robots.txt</li>
+									</ul>
 
-<p>Checking robots.txt:</p>
+									<p>Viewing robots.txt reveals a possible password:</p>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/robots.png">
-</span>
-
-<p>The file contains:</p>
+									<span class="image fit">
+										<img src="../images/pickle-rick/robots.png" alt="Robots File" />
+									</span>
 
 <pre><code>Wubbalubbadubdub</code></pre>
 
-<p>Trying it as a password on the login page:</p>
+									<hr class="major" />
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/login%20page.png">
-</span>
+									<h2>Login</h2>
 
-<p>Login successful.</p>
+									<p>Using the discovered credentials:</p>
 
-<pre><code>
-Username: R1ckRul3s
-Password: Wubbalubbadubdub
-</code></pre>
+									<ul>
+										<li>Username: R1ckRul3s</li>
+										<li>Password: Wubbalubbadubdub</li>
+									</ul>
 
-<p>Inside we find a command panel:</p>
+									<span class="image fit">
+										<img src="../images/pickle-rick/login.png" alt="Login Page" />
+									</span>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/cmd%20panel.png">
-</span>
+									<p>We gain access to a command panel.</p>
 
-<p>Running:</p>
+									<span class="image fit">
+										<img src="../images/pickle-rick/cmd.png" alt="Command Panel" />
+									</span>
+
+									<p>Listing files:</p>
 
 <pre><code>ls</code></pre>
 
-<p>Reveals:</p>
+									<p>We find the first ingredient file.</p>
 
-<pre><code>Sup3rS3cretPickl3Ingred.txt</code></pre>
-
-<p>However reading it using <code>cat</code> is blocked:</p>
-
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/cat%20blocked.png">
-</span>
-
-<p>Accessing the file directly through the browser reveals the flag:</p>
-
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/flag1.png">
-</span>
-
-<h3>Flag 1</h3>
+									<span class="image fit">
+										<img src="../images/pickle-rick/flag1.png" alt="Flag 1" />
+									</span>
 
 <pre><code>mr. meeseek hair</code></pre>
 
-<hr class="major"/>
+									<hr class="major" />
 
-<h2>Flag Two</h2>
+									<h2>Second Ingredient</h2>
 
-<p>Gobuster also revealed a clue file:</p>
+									<p>Checking Rick's home directory:</p>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/clue.png">
-</span>
+									<span class="image fit">
+										<img src="../images/pickle-rick/rickfiles.png" alt="Rick Files" />
+									</span>
 
-<p>Checking users on the system:</p>
+									<p>Reading the file reveals:</p>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/users.png">
-</span>
-
-<p>Listing Rick's directory:</p>
-
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/ricks%20files.png">
-</span>
-
-<p>The file name contains a space so we escape it:</p>
-
-<pre><code>
-while read line; do echo $line; done < /home/rick/second\ ingredients
-</code></pre>
-
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/flag2.png">
-</span>
-
-<h3>Flag 2</h3>
+									<span class="image fit">
+										<img src="../images/pickle-rick/flag2.png" alt="Flag 2" />
+									</span>
 
 <pre><code>1 jerry tear</code></pre>
 
-<hr class="major"/>
+									<hr class="major" />
 
-<h2>Flag Three</h2>
+									<h2>Final Ingredient</h2>
 
-<p>Checking the root directory:</p>
+									<p>Listing the root directory:</p>
 
 <pre><code>sudo ls -la /root</code></pre>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/roots%20files.png">
-</span>
+									<span class="image fit">
+										<img src="../images/pickle-rick/rootfiles.png" alt="Root Files" />
+									</span>
 
-<p>We find:</p>
+									<p>We copy the final file to the web directory and retrieve it.</p>
 
-<pre><code>3rd.txt</code></pre>
-
-<p>Copying it into the web directory:</p>
-
-<pre><code>
-sudo cp /root/3rd.txt ./3rdFlag.txt
-</code></pre>
-
-<p>Accessing the file reveals the final flag:</p>
-
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/3rd%20flag.png">
-</span>
-
-<h3>Flag 3</h3>
+									<span class="image fit">
+										<img src="../images/pickle-rick/flag3.png" alt="Flag 3" />
+									</span>
 
 <pre><code>fleeb juice</code></pre>
 
-<hr class="major"/>
+									<hr class="major" />
 
-<h2>Summary</h2>
+									<h2>Summary</h2>
 
-<p>The three ingredients recovered:</p>
+									<p>The three ingredients:</p>
 
 <pre><code>
-1. mr. meeseek hair
-2. 1 jerry tear
-3. fleeb juice
+mr. meeseek hair
+1 jerry tear
+fleeb juice
 </code></pre>
 
-<p>
-These ingredients allow Rick to turn back into a human.
-</p>
+									<p>Rick can now turn back into a human.</p>
 
-<p>
-Happy Hacking!
-<br>
-<b>Callum / y1sb0k</b>
-</p>
+								</div>
+							</section>
 
-<span class="image fit">
-<img src="https://raw.githubusercontent.com/y1sb0k/THM-Writeups/main/Pickle%20Rick/assets/Evil%20Morty.webp">
-</span>
+					</div>
 
-</div>
-</section>
+				<!-- Contact -->
+					<section id="contact">
+						<div class="inner">
+							<section>
+								<form method="post" action="#">
+									<div class="fields">
+										<div class="field half">
+											<label for="name">Name</label>
+											<input type="text" name="name" id="name" />
+										</div>
+										<div class="field half">
+											<label for="email">Email</label>
+											<input type="text" name="email" id="email" />
+										</div>
+										<div class="field">
+											<label for="message">Message</label>
+											<textarea name="message" id="message" rows="6"></textarea>
+										</div>
+									</div>
+									<ul class="actions">
+										<li><input type="submit" value="Send Message" class="primary" /></li>
+										<li><input type="reset" value="Clear" /></li>
+									</ul>
+								</form>
+							</section>
+						</div>
+					</section>
 
-</div>
+				<!-- Footer -->
+					<footer id="footer">
+						<div class="inner">
+							<ul class="icons">
+								<li><a href="https://x.com/y1sb0k" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+								<li><a href="https://tryhackme.com/p/y1sb0k" class="icon solid alt fa-terminal"><span class="label">TryHackMe</span></a></li>
+								<li><a href="https://github.com/y1sb0k" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+								<li><a href="https://www.linkedin.com/in/callumgiblin/" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+							</ul>
+							<ul class="copyright">
+								<li>&copy; Callum Giblin 2026</li>
+								<li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</footer>
 
-</div>
+			</div>
 
-</body>
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
 </html>
