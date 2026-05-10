@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toolbox Hub - eWPT</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 40px; }
+        .header-container { border-bottom: 2px solid #bb86fc; padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { color: #bb86fc; margin: 0; letter-spacing: 1px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .tool-card { 
+            background-color: #1e1e1e; 
+            border: 1px solid #333; 
+            padding: 20px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            color: inherit; 
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-card:hover { 
+            transform: translateY(-5px); 
+            border-color: #bb86fc; 
+            background-color: #252525;
+        }
+        .tool-name { color: #bb86fc; font-size: 1.4em; font-weight: bold; margin-bottom: 10px; }
+        .tool-desc { font-size: 0.9em; color: #b0b0b0; line-height: 1.4; }
+        .status-tag { 
+            margin-top: 15px; 
+            font-size: 0.7em; 
+            text-transform: uppercase; 
+            color: #03dac6; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h2>🛠️ PENTEST TOOLBOX</h2>
+    </div>
+    
+    <div class="grid-container" id="toolGrid">
+        <!-- Links populated by JS -->
+    </div>
+
+    <script>
+        // ADD NEW TOOLS HERE
+        const tools = [
+            { 
+                name: "XSS Checklist", 
+                url: "xss.html", 
+                desc: "Cross-Site Scripting payloads with Base64 copy support and event handler bypasses." 
+            },
+            { 
+                name: "SQLi Checklist", 
+                url: "sqli.html", 
+                desc: "SQL Injection vectors for MySQL, MSSQL, and Postgres. Includes time-based and union tests." 
+            },
+            { 
+                name: "LFI/RFI", 
+                url: "#", 
+                desc: "Local/Remote File Inclusion payloads, wrapper tricks, and directory traversal strings. (Pending)" 
+            },
+            { 
+                name: "Auth Bypass", 
+                url: "#", 
+                desc: "Common logic flaw tests, JWT manipulation ideas, and session fixation payloads. (Pending)" 
+            }
+        ];
+
+        const grid = document.getElementById('toolGrid');
+
+        tools.forEach(tool => {
+            const card = document.createElement('a');
+            card.href = tool.url;
+            card.className = 'tool-card';
+            
+            card.innerHTML = `
+                <div class="tool-name">${tool.name}</div>
+                <div class="tool-desc">${tool.desc}</div>
+                <div class="status-tag">${tool.url === '#' ? 'Coming Soon' : 'Ready'}</div>
+            `;
+            
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
