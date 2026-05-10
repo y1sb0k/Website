@@ -8,7 +8,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 40px; }
         .header-container { border-bottom: 2px solid #bb86fc; padding-bottom: 10px; margin-bottom: 30px; }
         h2 { color: #bb86fc; margin: 0; letter-spacing: 1px; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .tool-card { 
             background-color: #1e1e1e; 
             border: 1px solid #333; 
@@ -16,31 +16,36 @@
             border-radius: 8px; 
             text-decoration: none; 
             color: inherit; 
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
         .tool-card:hover { 
             transform: translateY(-5px); 
             border-color: #bb86fc; 
             background-color: #252525;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
         .tool-name { color: #bb86fc; font-size: 1.4em; font-weight: bold; margin-bottom: 10px; }
-        .tool-desc { font-size: 0.9em; color: #b0b0b0; line-height: 1.4; }
+        .tool-desc { font-size: 0.9em; color: #b0b0b0; line-height: 1.4; margin-bottom: 15px; }
         .status-tag { 
-            margin-top: 15px; 
             font-size: 0.7em; 
             text-transform: uppercase; 
             color: #03dac6; 
             font-weight: bold; 
             letter-spacing: 1px;
+            align-self: flex-start;
+            padding: 2px 8px;
+            background: rgba(3, 218, 198, 0.1);
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
     <div class="header-container">
-        <h2>🛠️ PENTEST TOOLBOX</h2>
+        <h2>🛠️ PENTEST TOOLBOX v2.0</h2>
     </div>
     
     <div class="grid-container" id="toolGrid">
@@ -48,27 +53,41 @@
     </div>
 
     <script>
-        // ADD NEW TOOLS HERE
         const tools = [
             { 
                 name: "XSS Checklist", 
                 url: "xss.html", 
-                desc: "Cross-Site Scripting payloads with Base64 copy support and event handler bypasses." 
+                desc: "Cross-Site Scripting payloads with Base64 copy support and filter bypasses." 
             },
             { 
                 name: "SQLi Checklist", 
                 url: "sqli.html", 
-                desc: "SQL Injection vectors for MySQL, MSSQL, and Postgres. Includes time-based and union tests." 
+                desc: "Union, Error, and Time-based SQL injection vectors for various DB engines." 
             },
             { 
                 name: "LFI/RFI", 
                 url: "lfi.html", 
-                desc: "Local/Remote File Inclusion payloads, wrapper tricks, and directory traversal strings. " 
+                desc: "Directory traversal strings and PHP wrappers for local/remote file inclusion." 
             },
             { 
                 name: "Auth Bypass", 
                 url: "auth.html", 
-                desc: "Common logic flaw tests, JWT manipulation ideas, and session fixation payloads. " 
+                desc: "Logic flaw tests, header spoofing, and session manipulation tactics." 
+            },
+            { 
+                name: "Command Injection", 
+                url: "cmd.html", 
+                desc: "OS command execution tests for both Linux and Windows environments." 
+            },
+            { 
+                name: "CSRF PoC", 
+                url: "csrf.html", 
+                desc: "Quick HTML templates for proving Cross-Site Request Forgery impacts." 
+            },
+            { 
+                name: "Reverse Shells", 
+                url: "shells.html", 
+                desc: "One-liners for getting interactive access via various languages and tools." 
             }
         ];
 
@@ -77,12 +96,16 @@
         tools.forEach(tool => {
             const card = document.createElement('a');
             card.href = tool.url;
+            card.target = "_blank"; // Opens in new tab
+            card.rel = "noopener noreferrer"; // Security best practice
             card.className = 'tool-card';
             
             card.innerHTML = `
-                <div class="tool-name">${tool.name}</div>
-                <div class="tool-desc">${tool.desc}</div>
-                <div class="status-tag">${tool.url === '#' ? 'Coming Soon' : 'Ready'}</div>
+                <div>
+                    <div class="tool-name">${tool.name}</div>
+                    <div class="tool-desc">${tool.desc}</div>
+                </div>
+                <div class="status-tag">Live Tool</div>
             `;
             
             grid.appendChild(card);
